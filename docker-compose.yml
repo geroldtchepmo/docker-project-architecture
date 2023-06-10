@@ -1,0 +1,54 @@
+version: "3"
+
+services:
+  victime:
+    build:
+      context: .
+      dockerfile: Dockerfile_victime
+    stdin_open: true
+    privileged: true
+    tty: true
+    networks: 
+      PAN :
+        ipv4_address: 10.10.10.2
+    #command: ip route replace default via 10.10.10.254
+  hacker:
+    build:
+      context: .
+      dockerfile: Dockerfile_Hacker
+    stdin_open: true
+    privileged: true
+    tty: true
+    networks: 
+      WAN:
+        ipv4_address: 192.168.10.2
+  firewall:
+    build:
+      context: .
+      dockerfile: Dockerfile_Firewall
+    stdin_open: true
+    privileged: true
+    tty: true 
+    networks:
+      PAN:
+        ipv4_address: 10.10.10.254
+      WAN:
+        ipv4_address: 192.168.10.254
+
+networks:
+  PAN:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24
+          ip_range: 10.10.10.0/24
+          gateway: 10.10.10.1
+  WAN:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.10.0/24
+          ip_range: 192.168.10.0/24
+          gateway: 192.168.10.1
+
+#install scapy on docker, create link github
