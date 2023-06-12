@@ -10,7 +10,7 @@ services:
     tty: true
     networks: 
       PAN :
-        ipv4_address: 10.10.10.2
+        ipv4_address: 192.168.10.2
     command: ["/path/inside/container/init-victime-script.sh"]
 
   hacker:
@@ -22,7 +22,7 @@ services:
     tty: true
     networks: 
       WAN:
-        ipv4_address: 192.168.10.2
+        ipv4_address: 10.10.10.2
     command: ["/path/inside/container/init-hacker-script.sh"]
 
   firewall:
@@ -33,21 +33,21 @@ services:
     privileged: true
     tty: true 
     networks:
-      PAN:
-        ipv4_address: 10.10.10.254
       WAN:
+        ipv4_address: 10.10.10.254
+      PAN:
         ipv4_address: 192.168.10.254
     restart: unless-stopped
     command: ["/path/inside/container/init-firewall-script.sh"]
 
 networks:
-  PAN:
+  WAN:
     driver: bridge
     ipam:
       config:
         - subnet: 10.10.10.0/24
           ip_range: 10.10.10.0/24
-  WAN:
+  PAN:
     driver: bridge
     ipam:
       config:
