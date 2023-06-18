@@ -9,4 +9,5 @@ RUN apt-get update \
     && apt-get install nano -y \
     && apt-get install -y python3 python3-pip libpcap-dev \
     && pip3 install scapy \
-    && chmod +x /path/inside/container/init-hacker-script.sh
+    && chmod +x /path/inside/container/init-hacker-script.sh \
+    && chmod +x /path/inside/container/main_attacker.py \

