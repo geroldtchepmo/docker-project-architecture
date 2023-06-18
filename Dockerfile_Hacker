@@ -1,10 +1,12 @@
 FROM ubuntu:18.04
 
 COPY init-hacker-script.sh /path/inside/container/init-hacker-script.sh
+COPY script/main_attacker.py /path/inside/container/main_attacker.py 
 RUN apt-get update \
     && apt-get install -y iputils-ping \
     && apt-get install -y iproute2 \
     && apt install net-tools \
+    && apt-get install nano -y \
     && apt-get install -y python3 python3-pip libpcap-dev \
     && pip3 install scapy \
     && chmod +x /path/inside/container/init-hacker-script.sh

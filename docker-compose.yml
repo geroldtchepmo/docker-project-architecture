@@ -12,7 +12,7 @@ services:
       PAN :
         ipv4_address: 192.168.10.2
     command: ["/path/inside/container/init-victime-script.sh"]
-
+    
   hacker:
     build:
       context: .
