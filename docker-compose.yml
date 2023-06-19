@@ -11,7 +11,7 @@ services:
     networks: 
       PAN :
         ipv4_address: 192.168.10.2
-    command: ["/path/inside/container/init-victime-script.sh"]
+    command: ["/init-victime-script.sh"]
     
   hacker:
     build:
@@ -23,7 +23,7 @@ services:
     networks: 
       WAN:
         ipv4_address: 10.10.10.2
-    command: ["/path/inside/container/init-hacker-script.sh"]
+    command: ["/init-hacker-script.sh"]
 
   firewall:
     build:
@@ -38,7 +38,7 @@ services:
       PAN:
         ipv4_address: 192.168.10.254
     restart: unless-stopped
-    command: ["/path/inside/container/init-firewall-script.sh"]
+    command: ["/init-firewall-script.sh"]
 
 networks:
   WAN:

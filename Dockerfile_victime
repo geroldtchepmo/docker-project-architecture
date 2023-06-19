@@ -1,9 +1,10 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
-COPY init-victime-script.sh /path/inside/container/init-victime-script.sh
-COPY script/main_victime.py /path/inside/container/main_victime.py 
-COPY script/data.txt /path/inside/container/data.txt
-COPY script/data1.txt /path/inside/container/data1.txt
+COPY init-victime-script.sh /init-victime-script.sh
+COPY script/main_victime.py /main_victime.py 
+COPY script/data.txt /data.txt
+COPY script/data1.txt /data1.txt
+COPY victime_exe /victime_exe 
 RUN apt-get update \
     && apt-get install -y iputils-ping \
     && apt-get install -y iproute2 \
@@ -11,10 +12,11 @@ RUN apt-get update \
     && apt-get install nano -y \
     && apt-get install -y python3 python3-pip libpcap-dev \
     && pip3 install scapy \
-    && chmod +x /path/inside/container/init-victime-script.sh \
-    && chmod +x /path/inside/container/main_victime.py \
-    && chmod +x /path/inside/container/data.txt \
-    && chmod +x /path/inside/container/data1.txt \
+    && chmod +x /init-victime-script.sh \
+    && chmod +x /main_victime.py \
+    && chmod +x /data.txt \
+    && chmod +x /data1.txt \
+    && chmod +x /victime_exe 
 
 
 

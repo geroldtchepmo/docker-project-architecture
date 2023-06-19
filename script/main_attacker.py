@@ -75,7 +75,7 @@ def spoof_ping_reply(pkt):
             spoof_ping_reply.messages_packets = []
         else:
             print("Normal ping request detected")
-            # default_reply(pkt)
+            default_reply(pkt)
 
 
 if __name__ == '__main__':
